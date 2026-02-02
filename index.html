@@ -14,7 +14,7 @@
   html,body{height:100%;margin:0;background:linear-gradient(180deg,#f6f9ff 0%,var(--bg) 100%);-webkit-font-smoothing:antialiased}
   .wrap{max-width:1050px;margin:28px auto;padding:18px;}
   header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-  .app-logo{width:44px;height:44px;border-radius:10px;display:block;object-fit:cover;box-shadow:0 6px 18px rgba(18,38,63,0.08)}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
   h1{font-size:1.15rem;margin:0}
   .subtitle{color:var(--muted);font-size:13px}
 
@@ -56,7 +56,7 @@
 <body>
   <div class="wrap">
     <header>
-      <img src="logo.svg" alt="Garment Color Matcher logo" class="app-logo" />
+      <div class="logo">GM</div>
       <div>
         <h1>Garment Color Matcher</h1>
         <div class="subtitle">Extract an exact garment color and find the perceptually nearest named color (Delta E), plus suggested palettes.</div>
@@ -502,7 +502,13 @@ const CSS_COLOR_LIST = [
   {name:'PaleTurquoise', hex:'#AFEEEE'},{name:'PaleVioletRed', hex:'#DB7093'},{name:'PapayaWhip', hex:'#FFEFD5'},{name:'PeachPuff', hex:'#FFDAB9'},
   {name:'Peru', hex:'#CD853F'},{name:'Pink', hex:'#FFC0CB'},{name:'Plum', hex:'#DDA0DD'},{name:'PowderBlue', hex:'#B0E0E6'},
   {name:'Purple', hex:'#800080'},{name:'RebeccaPurple', hex:'#663399'},{name:'Red', hex:'#FF0000'},{name:'RosyBrown', hex:'#BC8F8F'},
-  {name:'RoyalBlue', hex:'#4169E1'},{name:'SaddleBrown', hex:'#8B4513'}
+  {name:'RoyalBlue', hex:'#4169E1'},{name:'SaddleBrown', hex:'#8B4513'},{name:'Salmon', hex:'#FA8072'},{name:'SandyBrown', hex:'#F4A460'},
+  {name:'SeaGreen', hex:'#2E8B57'},{name:'SeaShell', hex:'#FFF5EE'},{name:'Sienna', hex:'#A0522D'},{name:'Silver', hex:'#C0C0C0'},
+  {name:'SkyBlue', hex:'#87CEEB'},{name:'SlateBlue', hex:'#6A5ACD'},{name:'SlateGray', hex:'#708090'},{name:'Snow', hex:'#FFFAFA'},
+  {name:'SpringGreen', hex:'#00FF7F'},{name:'SteelBlue', hex:'#4682B4'},{name:'Tan', hex:'#D2B48C'},{name:'Teal', hex:'#008080'},
+  {name:'Thistle', hex:'#D8BFD8'},{name:'Tomato', hex:'#FF6347'},{name:'Turquoise', hex:'#40E0D0'},{name:'Violet', hex:'#EE82EE'},
+  {name:'Wheat', hex:'#F5DEB3'},{name:'White', hex:'#FFFFFF'},{name:'WhiteSmoke', hex:'#F5F5F5'},{name:'Yellow', hex:'#FFFF00'},
+  {name:'YellowGreen', hex:'#9ACD32'}
 ];
 
 /* ---------- Initialization ---------- */
