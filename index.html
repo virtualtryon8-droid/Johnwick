@@ -127,6 +127,11 @@
         </div>
       </div>
     </div>
+
+    <!-- Developer credit footer -->
+    <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--muted)">
+      Developed by <a href="https://gravatar.com/katragaddasurendra" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:none;font-weight:600">Katragadda Surendra</a>
+    </div>
   </div>
 
 <script>
@@ -505,25 +510,6 @@ const CSS_COLOR_LIST = [
   {name:'Wheat', hex:'#F5DEB3'},{name:'White', hex:'#FFFFFF'},{name:'WhiteSmoke', hex:'#F5F5F5'},{name:'Yellow', hex:'#FFFF00'},
   {name:'YellowGreen', hex:'#9ACD32'}
 ];
-
-/* ---------- Nearest-match wrapper (uses Lab + CIEDE2000) ---------- */
-function findNearestNamedColor(rgb, colorList){
-  const best = findNearestNamedColor; // alias for outer function (exists above) - safe fallback
-  // use previously defined implementation
-  // We call the implementation defined earlier (it's the same name).
-  return (function(rgbLocal, list){ // inline to avoid accidental hoisting issues
-    const lab1 = rgbToLab(rgbLocal);
-    let bestRes = null, bestDE = Infinity;
-    for (const c of list){
-      const hex = c.hex.replace('#','');
-      const r = parseInt(hex.substring(0,2),16), g = parseInt(hex.substring(2,4),16), b = parseInt(hex.substring(4,6),16);
-      const lab2 = rgbToLab([r,g,b]);
-      const dE = deltaE00(lab1, lab2);
-      if (dE < bestDE){ bestDE = dE; bestRes = {name: c.name, hex: '#' + hex.toLowerCase(), deltaE: dE}; }
-    }
-    return bestRes;
-  })(rgb, colorList);
-}
 
 /* ---------- Initialization ---------- */
 setStatus('Ready');
