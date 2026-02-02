@@ -3,322 +3,375 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Garment Color Matcher</title>
+<title>Garment Color Matcher — Professional</title>
+<link rel="icon" href="data:,">
 <style>
-  :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;--bg:#f6f7fb;--card:#fff;--muted:#666}
-  body{margin:0;background:var(--bg);color:#111;padding:20px;display:flex;justify-content:center}
-  .app{max-width:900px;width:100%}
-  header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-  h1{font-size:1.25rem;margin:0}
-  .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(20,30,60,0.06);margin-bottom:16px}
-  .uploader{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  input[type=file]{padding:8px}
-  .preview{display:flex;gap:12px;align-items:center}
-  canvas{max-width:320px;border-radius:8px;max-height:320px}
-  .swatches{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .swatch{width:110px;height:96px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
-  .swatch .info{background:rgba(255,255,255,0.92);padding:6px;font-size:12px;color:#111}
-  .swatch .name{font-size:11px;color:rgba(0,0,0,0.6);margin-top:3px}
-  .btn{background:#0b74ff;color:#fff;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
-  .palettes{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .palette{width:200px;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,0.06)}
-  .palette .row{height:36px;display:flex}
-  .palette .chip{flex:1}
-  .palette .meta{padding:8px;background:#fff}
-  .meta .title{font-weight:600;font-size:13px}
-  .meta .names{font-size:12px;color:var(--muted);margin-top:6px}
-  .small{font-size:13px;color:var(--muted)}
-  footer{font-size:12px;color:var(--muted);margin-top:8px}
-  .controls{display:flex;gap:8px;align-items:center;margin-left:auto}
-  @media (max-width:640px){.preview{flex-direction:column;align-items:flex-start} .swatch{width:72px;height:72px}}
+  :root{
+    --bg:#f4f7fb; --card:#ffffff; --muted:#65707a; --accent:#2563eb; --ok:#16a34a;
+    --radius:12px; --shadow: 0 8px 28px rgba(18,38,63,0.08);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color-scheme: light;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#f6f9ff 0%,var(--bg) 100%);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:28px auto;padding:20px;}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+  h1{font-size:1.15rem;margin:0}
+  .subtitle{color:var(--muted);font-size:13px}
+
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .preview-card{display:flex;flex-direction:column;gap:12px;min-height:420px}
+  .canvas-wrap{position:relative;border-radius:10px;border:1px solid rgba(16,24,40,0.04);overflow:hidden;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:320px}
+  canvas{max-width:100%;height:auto;display:block}
+  .drop-hint{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.9);padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);box-shadow:0 6px 18px rgba(12,24,48,0.04)}
+  .controls{display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:8px;align-items:center}
+  .file-btn{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;border:1px dashed rgba(37,99,235,0.18);background:linear-gradient(180deg,rgba(37,99,235,0.04),transparent);color:var(--accent);cursor:pointer}
+  .file-btn input{display:none}
+  .btn{background:var(--accent);color:white;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.08)}
+  .btn.small{padding:8px 10px;font-size:13px}
+  label.small{font-size:13px;color:var(--muted)}
+  .muted{color:var(--muted);font-size:13px}
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .swatch{
+    width:120px;height:98px;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.03);cursor:pointer;position:relative;border:1px solid rgba(0,0,0,0.02)
+  }
+  .swatch .meta{background:rgba(255,255,255,0.92);padding:8px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+  .swatch .meta .hex{font-weight:700}
+  .swatch .meta .name{font-size:12px;color:var(--muted)}
+  .swatch .copy{position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.85);border-radius:6px;padding:6px;font-size:12px;border:0;cursor:pointer}
+  .suggestions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+  .palette{border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.04);background:#fff}
+  .palette .row{height:44px;display:flex}
+  .palette .meta{padding:10px;font-size:13px;color:var(--muted)}
+  .palette .title{font-weight:700;color:#0f172a}
+  .options{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .footer{margin-top:12px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+  .export{display:flex;gap:8px;align-items:center}
+  .kbd{background:#f2f4f7;border-radius:6px;padding:6px;font-family:monospace;font-size:12px}
+
+  /* selection rectangle */
+  .sel-rect{position:absolute;border:2px dashed rgba(255,255,255,0.85);pointer-events:none;box-sizing:border-box;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))}
+  /* responsive */
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} .preview-card{min-height:320px} .card{padding:14px} }
 </style>
 </head>
 <body>
-  <div class="app">
+  <div class="wrap">
     <header>
-      <h1>Garment Color Matcher</h1>
-      <div class="controls small">Upload → Pick a swatch → See suggested matches (names included)</div>
-    </header>
-
-    <section class="card">
-      <div class="uploader">
-        <input id="file" type="file" accept="image/*">
-        <button id="auto" class="btn">Auto extract</button>
-        <button id="download" class="btn" style="background:#22a652">Download palette</button>
-      </div>
-
-      <div style="margin-top:12px" class="preview">
-        <canvas id="canvas"></canvas>
-        <div style="flex:1">
-          <div class="small">Dominant colors (click to select as primary)</div>
-          <div class="swatches" id="swatches"></div>
-          <div class="small" style="margin-top:10px">Selected primary color:</div>
-          <div id="primaryInfo" class="small" style="margin-top:6px">— none —</div>
+      <div class="brand">
+        <div class="logo">GM</div>
+        <div>
+          <h1>Garment Color Matcher</h1>
+          <div class="subtitle">Extract garment colors, see named matches and suggested palettes — runs in your browser.</div>
         </div>
       </div>
-    </section>
+    </header>
 
-    <section id="suggestions" class="card" style="display:none">
-      <h3 style="margin-top:0">Suggested matches</h3>
-      <div class="palettes" id="palettes"></div>
-      <div style="margin-top:12px" class="small">Rules: Complementary (hue+180°), Analogous (h±30°), Triadic (h±120°), Tints/Shades (lighter/darker)</div>
-    </section>
+    <div class="grid">
+      <!-- Left: Preview + canvas -->
+      <div class="card preview-card" aria-live="polite">
+        <div class="canvas-wrap" id="canvasWrap" tabindex="0" aria-label="Image preview area. Drop an image here or use upload.">
+          <div id="dropHint" class="drop-hint">Drop image or click Upload</div>
+          <canvas id="canvas" role="img" aria-label="Uploaded image preview"></canvas>
+          <div id="selRect" class="sel-rect" style="display:none"></div>
+        </div>
 
-    <footer class="small">This runs fully in your browser. Host this file on GitHub Pages (place at docs/index.html and enable Pages) to publish.</footer>
+        <div class="row">
+          <label class="file-btn" title="Click to open file picker">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M12 3v12" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Upload image</span>
+            <input id="file" type="file" accept="image/*" capture="environment" />
+          </label>
+
+          <button class="btn" id="btnExtract" title="Extract colors from image">Auto Extract</button>
+          <button class="btn ghost" id="btnClear" title="Clear image">Clear</button>
+
+          <div style="margin-left:auto" class="muted">Tip: crop selection to focus on the garment</div>
+        </div>
+
+        <div class="row">
+          <label class="small">Colors:
+            <select id="numColors" aria-label="Number of colors to extract" style="margin-left:8px;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+
+          <label style="margin-left:12px" class="small"><input type="checkbox" id="useSelection" /> Use selection</label>
+
+          <div style="margin-left:auto" class="options">
+            <button id="downloadJSON" class="btn small" title="Download palette JSON">Download JSON</button>
+            <button id="downloadImage" class="btn small" title="Download palette image" style="background:linear-gradient(90deg,#f97316,#f43f5e)">Export Image</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="muted" style="margin-top:8px">Dominant colors (click to set primary)</div>
+          <div id="swatches" class="swatches" role="list" aria-label="Extracted color swatches"></div>
+        </div>
+
+      </div>
+
+      <!-- Right: Suggestions + metadata -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:700;font-size:15px">Selected primary</div>
+            <div id="primaryInfo" class="muted" style="margin-top:6px">No color selected</div>
+          </div>
+          <div class="export">
+            <div id="status" class="muted">Ready</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="muted">Suggested palettes</div>
+          <div id="palettes" class="suggestions"></div>
+        </div>
+
+        <div class="footer">
+          <div class="muted">Runs fully client-side — no uploads required.</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="kbd">Local</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
-/* Client-side color extractor + name finder
-   - Extracts 4 dominant colors via simple KMeans
-   - Shows color name for each (nearest from common CSS color list)
+/* Professional Garment Color Matcher
+   - Drag & drop + file picker + camera
+   - Resizable selection (click+drag) to crop area for extraction
+   - KMeans (client-side) on downsampled pixels
+   - Color name lookup (nearest from a curated list)
+   - Copy-to-clipboard and export features
 */
 
-// Minimal list of common colors with hex values. Add more if you like.
+/* ---------- Config ---------- */
+const SAMPLE_MAX = 240; // downsample max for KMeans
+const DEFAULT_K = 4;
 const NAMED_COLORS = [
-  {name:'black',hex:'#000000'},{name:'white',hex:'#ffffff'},{name:'silver',hex:'#c0c0c0'},{name:'gray',hex:'#808080'},
-  {name:'maroon',hex:'#800000'},{name:'red',hex:'#ff0000'},{name:'orange',hex:'#ffa500'},{name:'gold',hex:'#ffd700'},
-  {name:'yellow',hex:'#ffff00'},{name:'olive',hex:'#808000'},{name:'green',hex:'#008000'},{name:'lime',hex:'#00ff00'},
-  {name:'teal',hex:'#008080'},{name:'cyan',hex:'#00ffff'},{name:'blue',hex:'#0000ff'},{name:'navy',hex:'#000080'},
-  {name:'purple',hex:'#800080'},{name:'fuchsia',hex:'#ff00ff'},{name:'pink',hex:'#ffc0cb'},{name:'hotpink',hex:'#ff69b4'},
-  {name:'salmon',hex:'#fa8072'},{name:'coral',hex:'#ff7f50'},{name:'tomato',hex:'#ff6347'},{name:'sienna',hex:'#a0522d'},
-  {name:'brown',hex:'#a52a2a'},{name:'chocolate',hex:'#d2691e'},{name:'beige',hex:'#f5f5dc'},{name:'khaki',hex:'#f0e68c'},
-  {name:'lavender',hex:'#e6e6fa'},{name:'violet',hex:'#ee82ee'},{name:'indigo',hex:'#4b0082'},{name:'royalblue',hex:'#4169e1'},
-  {name:'steelblue',hex:'#4682b4'},{name:'tealgreen',hex:'#0e7c61'},{name:'mint',hex:'#98ff98'},{name:'mintcream',hex:'#f5fffa'}
+  // curated list for friendly names (expandable)
+  {name:'Black',hex:'#000000'},{name:'White',hex:'#ffffff'},{name:'Gray',hex:'#808080'},{name:'Silver',hex:'#c0c0c0'},
+  {name:'Red',hex:'#ff0000'},{name:'Maroon',hex:'#800000'},{name:'Orange',hex:'#ff7f00'},{name:'Gold',hex:'#ffd700'},
+  {name:'Yellow',hex:'#ffff00'},{name:'Olive',hex:'#808000'},{name:'Green',hex:'#008000'},{name:'Lime',hex:'#00ff00'},
+  {name:'Teal',hex:'#008080'},{name:'Cyan',hex:'#00ffff'},{name:'Blue',hex:'#0000ff'},{name:'Navy',hex:'#000080'},
+  {name:'Purple',hex:'#800080'},{name:'Magenta',hex:'#ff00ff'},{name:'Pink',hex:'#ffc0cb'},{name:'Coral',hex:'#ff7f50'},
+  {name:'Salmon',hex:'#fa8072'},{name:'Brown',hex:'#a52a2a'},{name:'Beige',hex:'#f5f5dc'},{name:'Khaki',hex:'#f0e68c'},
+  {name:'Lavender',hex:'#e6e6fa'},{name:'Indigo',hex:'#4b0082'},{name:'Royal Blue',hex:'#4169e1'},{name:'Sky Blue',hex:'#87ceeb'},
+  {name:'Mint',hex:'#98ff98'},{name:'Olive Drab',hex:'#6b8e23'},{name:'Chocolate',hex:'#d2691e'},{name:'Tomato',hex:'#ff6347'}
 ];
 
 const fileInput = document.getElementById('file');
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d', {willReadFrequently:true});
+const canvasWrap = document.getElementById('canvasWrap');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const dropHint = document.getElementById('dropHint');
 const swatchesEl = document.getElementById('swatches');
-const autoBtn = document.getElementById('auto');
-const suggestions = document.getElementById('suggestions');
+const btnExtract = document.getElementById('btnExtract');
+const btnClear = document.getElementById('btnClear');
+const numColorsSel = document.getElementById('numColors');
+const useSelectionCheckbox = document.getElementById('useSelection');
 const palettesEl = document.getElementById('palettes');
 const primaryInfo = document.getElementById('primaryInfo');
-const downloadBtn = document.getElementById('download');
+const statusEl = document.getElementById('status');
+const selRectEl = document.getElementById('selRect');
+const downloadJSONBtn = document.getElementById('downloadJSON');
+const downloadImageBtn = document.getElementById('downloadImage');
 
+let imgObj = null;
+let imageDataCache = null;
 let lastPalette = null;
+let primaryColor = null;
 
-fileInput.addEventListener('change', async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const img = await loadImage(URL.createObjectURL(f));
-  drawPreview(img);
-  extractAndShow();
+/* ---------- Drag & Drop + file handling ---------- */
+function setStatus(t){ statusEl.textContent = t; }
+['dragenter','dragover'].forEach(ev => {
+  canvasWrap.addEventListener(ev, e => { e.preventDefault(); canvasWrap.style.outline='2px solid rgba(37,99,235,0.18)'; dropHint.textContent='Drop to upload'; });
+});
+['dragleave','drop'].forEach(ev => {
+  canvasWrap.addEventListener(ev, e => { e.preventDefault(); canvasWrap.style.outline='none'; dropHint.textContent='Drop image or click Upload'; });
+});
+canvasWrap.addEventListener('drop', e=>{
+  e.preventDefault();
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) handleFile(f);
 });
 
-autoBtn.addEventListener('click', extractAndShow);
-
-downloadBtn.addEventListener('click', () => {
-  if (!lastPalette) return alert('No palette to download');
-  const blob = new Blob([JSON.stringify(lastPalette, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'palette.json'; document.body.appendChild(a);
-  a.click(); a.remove(); URL.revokeObjectURL(url);
+fileInput.addEventListener('change', async (e)=> {
+  const f = e.target.files[0]; if (!f) return;
+  handleFile(f);
 });
 
-function loadImage(src){
-  return new Promise((res, rej)=>{
-    const img = new Image();
-    img.onload = ()=>res(img);
-    img.onerror = rej;
-    img.src = src;
-    img.crossOrigin = "anonymous";
-  });
+/* ---------- File load & draw ---------- */
+async function handleFile(file){
+  setStatus('Loading image…');
+  const url = URL.createObjectURL(file);
+  const img = new Image(); img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    imgObj = img;
+    drawImageToCanvas(img);
+    setStatus('Image loaded');
+  };
+  img.onerror = () => { setStatus('Failed to load image'); alert('Unable to load image'); };
+  img.src = url;
 }
 
-function drawPreview(img, max=420){
-  const scale = Math.min(max / Math.max(img.width, img.height), 1);
-  canvas.width = Math.round(img.width * scale);
-  canvas.height = Math.round(img.height * scale);
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+function drawImageToCanvas(img){
+  // fit into container width
+  const maxW = Math.min(canvasWrap.clientWidth, 900);
+  const scale = Math.min(maxW / img.width, 1);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  canvas.width = w; canvas.height = h;
+  ctx.clearRect(0,0,w,h);
+  // white background for transparent images
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
+  ctx.drawImage(img, 0, 0, w, h);
+  imageDataCache = ctx.getImageData(0,0,w,h);
+  clearSelectionVisual();
+  swatchesEl.innerHTML = '';
+  palettesEl.innerHTML = '';
+  primaryInfo.textContent = 'No color selected';
 }
 
-async function extractAndShow(){
-  if (canvas.width === 0) return alert('Please upload an image first');
-  const sampleRes = 180;
-  const tmp = document.createElement('canvas');
-  const tctx = tmp.getContext('2d');
+/* ---------- Selection/Crop Rectangle ---------- */
+let selecting = false, selStart = null, selRect = null;
+canvasWrap.addEventListener('pointerdown', e=>{
+  if (!imgObj) return;
+  // only start selection if pointer is over the canvas
+  const rect = canvas.getBoundingClientRect();
+  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+  selecting = true;
+  selStart = {x: e.clientX - rect.left, y: e.clientY - rect.top};
+  selRect = {x: selStart.x, y: selStart.y, w: 0, h: 0};
+  updateSelectionVisual();
+});
+window.addEventListener('pointermove', e=>{
+  if (!selecting || !selStart) return;
+  const rect = canvas.getBoundingClientRect();
+  selRect.w = Math.max(1, Math.min(rect.width, (e.clientX - rect.left) - selStart.x));
+  selRect.h = Math.max(1, Math.min(rect.height, (e.clientY - rect.top) - selStart.y));
+  updateSelectionVisual();
+});
+window.addEventListener('pointerup', e=>{
+  if (!selecting) return;
+  selecting = false;
+  useSelectionCheckbox.checked = true;
+  // normalize negative widths (if user dragged left/up)
+  if (selRect.w < 0){ selRect.x += selRect.w; selRect.w = Math.abs(selRect.w); }
+  if (selRect.h < 0){ selRect.y += selRect.h; selRect.h = Math.abs(selRect.h); }
+  updateSelectionVisual();
+});
+
+function updateSelectionVisual(){
+  if (!selRect){ selRectEl.style.display = 'none'; return; }
+  selRectEl.style.left = (selRect.x + canvas.offsetLeft) + 'px';
+  selRectEl.style.top = (selRect.y + canvas.offsetTop) + 'px';
+  selRectEl.style.width = selRect.w + 'px';
+  selRectEl.style.height = selRect.h + 'px';
+  selRectEl.style.display = 'block';
+}
+function clearSelectionVisual(){
+  selRect = null;
+  selRectEl.style.display = 'none';
+  useSelectionCheckbox.checked = false;
+}
+
+/* ---------- Extraction (KMeans) ---------- */
+
+btnExtract.addEventListener('click', extractAndShow);
+btnClear.addEventListener('click', ()=>{
+  imgObj = null; ctx.clearRect(0,0,canvas.width,canvas.height); swatchesEl.innerHTML=''; palettesEl.innerHTML=''; primaryInfo.textContent='No color selected'; setStatus('Cleared'); clearSelectionVisual();
+});
+downloadJSONBtn.addEventListener('click', downloadJSON);
+downloadImageBtn.addEventListener('click', downloadPaletteImage);
+
+function extractAndShow(){
+  if (!imgObj) return alert('Please upload an image first');
+  setStatus('Extracting colors…');
+  setTimeout(()=>{ // allow UI update
+    const pixels = samplePixels();
+    if (pixels.length === 0){ setStatus('No valid pixels'); alert('No valid pixels found (try disabling use selection or upload a different image).'); return; }
+    const k = parseInt(numColorsSel.value,10) || DEFAULT_K;
+    const centers = kmeans(pixels, k, 12);
+    const labels = assignLabels(pixels, centers);
+    const counts = centers.map(()=>0);
+    labels.forEach(l=>counts[l]++);
+    const ordered = centers.map((c,i)=>({rgb: c.map(v=>Math.round(v)), count: counts[i]})).sort((a,b)=>b.count - a.count);
+    lastPalette = {input:'client',palette:ordered};
+    renderSwatches(ordered);
+    setStatus('Done');
+  }, 80);
+}
+
+function samplePixels(){
+  // extract image data for either whole canvas or selection
   const w = canvas.width, h = canvas.height;
-  const scale = Math.min(sampleRes / Math.max(w,h), 1);
-  tmp.width = Math.round(w * scale);
-  tmp.height = Math.round(h * scale);
-  tctx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
-  const imgd = tctx.getImageData(0,0,tmp.width,tmp.height);
+  let sx=0, sy=0, sw=w, sh=h;
+  if (useSelectionCheckbox.checked && selRect){
+    sx = Math.max(0, Math.floor(selRect.x));
+    sy = Math.max(0, Math.floor(selRect.y));
+    sw = Math.max(1, Math.min(w - sx, Math.floor(selRect.w)));
+    sh = Math.max(1, Math.min(h - sy, Math.floor(selRect.h)));
+  }
+  // downsample for speed
+  const scale = Math.min(1, SAMPLE_MAX / Math.max(sw, sh));
+  const tmpW = Math.max(1, Math.round(sw * scale));
+  const tmpH = Math.max(1, Math.round(sh * scale));
+  const tmp = document.createElement('canvas');
+  tmp.width = tmpW; tmp.height = tmpH;
+  const tctx = tmp.getContext('2d');
+  tctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, tmpW, tmpH);
+  const id = tctx.getImageData(0,0,tmpW,tmpH).data;
   const pixels = [];
-  for (let i=0;i<imgd.data.length;i+=4){
-    const r=imgd.data[i], g=imgd.data[i+1], b=imgd.data[i+2], a=imgd.data[i+3];
-    if (a<125) continue;
-    const l = (r+g+b)/3;
-    if (l < 10 || l > 245) continue;
+  for (let i=0;i<id.length;i+=4){
+    const r=id[i], g=id[i+1], b=id[i+2], a=id[i+3];
+    if (a < 125) continue; // ignore transparent
+    const lum = (r+g+b)/3;
+    if (lum < 8 || lum > 247) continue; // avoid extreme very dark/light background
     pixels.push([r,g,b]);
   }
-  if (pixels.length === 0) return alert('No valid pixels found (try a different photo or crop closer)');
-  const k = 4;
-  const centers = kmeans(pixels, k, 10);
-  const counts = new Array(centers.length).fill(0);
-  const labels = assignLabels(pixels, centers);
-  for (let i=0;i<labels.length;i++) counts[labels[i]]++;
-  const order = centers.map((c,i)=>({c,i,ct:counts[i]})).sort((a,b)=>b.ct-a.ct);
-  const ordered = order.map(o=>({rgb: o.c.map(v=>Math.round(v)), count: o.ct}));
-  showSwatches(ordered);
-  lastPalette = {input: 'client', palette: ordered};
+  return pixels;
 }
 
-function showSwatches(ordered){
-  swatchesEl.innerHTML = '';
-  ordered.forEach((s, idx) => {
-    const col = s.rgb;
-    const hex = rgbToHex(col);
-    const name = getColorName(col);
-    const el = document.createElement('div'); el.className = 'swatch';
-    el.style.background = hex;
-    const info = document.createElement('div'); info.className='info';
-    info.innerHTML = `<div style="font-weight:600">${hex}</div><div class="name">${name}</div><div style="font-size:11px;color:rgba(0,0,0,0.55)">${s.count} px</div>`;
-    el.appendChild(info);
-    el.title = 'Click to use as primary color';
-    el.style.cursor = 'pointer';
-    el.addEventListener('click', ()=>selectPrimary(s.rgb));
-    swatchesEl.appendChild(el);
-  });
-}
-
-function selectPrimary(rgb){
-  const hex = rgbToHex(rgb);
-  const name = getColorName(rgb);
-  primaryInfo.innerHTML = `<strong style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${hex};margin-right:6px;vertical-align:middle"></strong> ${hex} — ${name} — rgb(${rgb.join(',')})`;
-  buildSuggestions(rgb);
-}
-
-function buildSuggestions(rgb){
-  suggestions.style.display = 'block';
-  palettesEl.innerHTML = '';
-  const hsl = rgbToHsl(rgb);
-  const palettes = [];
-
-  // Complementary
-  palettes.push({
-    title:'Complementary',
-    colors: [rgb, hslShift(hsl,180)]
-  });
-  // Analogous (±30)
-  palettes.push({
-    title:'Analogous',
-    colors: [rgb, hslShift(hsl,-30), hslShift(hsl,30)]
-  });
-  // Triadic (±120)
-  palettes.push({
-    title:'Triadic',
-    colors: [rgb, hslShift(hsl,-120), hslShift(hsl,120)]
-  });
-  // Monochrome tints/shades
-  palettes.push({
-    title:'Tints / Shades',
-    colors: [hslSetL(hsl, clamp(hsl[2]+20,0,100)), rgb, hslSetL(hsl, clamp(hsl[2]-20,0,100)), hslSetL(hsl, clamp(hsl[2]-40,0,100))]
-  });
-
-  palettes.forEach(p=>{
-    const box = document.createElement('div'); box.className='palette';
-    const row = document.createElement('div'); row.className='row';
-    const names = [];
-    p.colors.slice(0,4).forEach(c=>{
-      // Normalize color object to [r,g,b] in 0..255
-      let rgbv;
-      if (Array.isArray(c) && c.length === 3 && c[0] <= 255) rgbv = c;
-      else if (Array.isArray(c) && c.length === 3) rgbv = hslToRgb(c);
-      else rgbv = [0,0,0];
-      const hex = rgbToHex(rgbv);
-      const chip = document.createElement('div'); chip.className='chip';
-      chip.style.background = hex;
-      row.appendChild(chip);
-      names.push(getColorName(rgbv));
-    });
-    const meta = document.createElement('div'); meta.className='meta';
-    const title = document.createElement('div'); title.className='title'; title.textContent = p.title;
-    const namesLine = document.createElement('div'); namesLine.className='names'; namesLine.textContent = names.join(' • ');
-    meta.appendChild(title); meta.appendChild(namesLine);
-    box.appendChild(row); box.appendChild(meta);
-    palettesEl.appendChild(box);
-  });
-
-  lastPalette.suggestions = palettes.map(p => ({title: p.title, colors: p.colors.map(c => {
-    let rgbv = (Array.isArray(c) && c.length === 3 && c[0] <= 255) ? c : (Array.isArray(c) ? hslToRgb(c) : [0,0,0]);
-    return {rgb: rgbv, hex: rgbToHex(rgbv), name: getColorName(rgbv)};
-  })}));
-}
-
-/* ---------- color helpers ---------- */
-
-function rgbToHex(rgb){ return '#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join(''); }
-
-function hexToRgb(hex){
-  const h = hex.replace('#','');
-  return [parseInt(h.substring(0,2),16), parseInt(h.substring(2,4),16), parseInt(h.substring(4,6),16)];
-}
-
-function rgbToHsl(rgb){
-  const r=rgb[0]/255, g=rgb[1]/255, b=rgb[2]/255;
-  const max=Math.max(r,g,b), min=Math.min(r,g,b);
-  let h=0, s=0, l=(max+min)/2;
-  if (max !== min){
-    const d = max-min;
-    s = l > 0.5 ? d/(2-max-min) : d/(max+min);
-    switch(max){
-      case r: h = (g-b)/d + (g < b ? 6 : 0); break;
-      case g: h = (b-r)/d + 2; break;
-      case b: h = (r-g)/d + 4; break;
-    }
-    h *= 60;
-  }
-  return [Math.round(h), Math.round(s*100), Math.round(l*100)];
-}
-
-function hslToRgb(hsl){
-  let [h,s,l] = hsl;
-  s /= 100; l /= 100;
-  const c = (1 - Math.abs(2*l - 1)) * s;
-  const hp = h / 60;
-  const x = c * (1 - Math.abs(hp % 2 - 1));
-  let r1=0,g1=0,b1=0;
-  if (0 <= hp && hp < 1){ r1=c; g1=x; b1=0; }
-  else if (1 <= hp && hp < 2){ r1=x; g1=c; b1=0; }
-  else if (2 <= hp && hp < 3){ r1=0; g1=c; b1=x; }
-  else if (3 <= hp && hp < 4){ r1=0; g1=x; b1=c; }
-  else if (4 <= hp && hp < 5){ r1=x; g1=0; b1=c; }
-  else { r1=c; g1=0; b1=x; }
-  const m = l - c/2;
-  const r = Math.round((r1 + m)*255);
-  const g = Math.round((g1 + m)*255);
-  const b = Math.round((b1 + m)*255);
-  return [clamp(r,0,255), clamp(g,0,255), clamp(b,0,255)];
-}
-
-function hslShift(hsl, dh){ return [ ( (hsl[0] + dh + 360 ) % 360 ), hsl[1], hsl[2] ]; }
-function hslSetL(hsl, L){ return [hsl[0], hsl[1], L]; }
-function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
-
-/* ---------- simple kmeans ---------- */
-
+/* ---------- KMeans (simple, lightweight) ---------- */
 function kmeans(pixels, k=4, maxIter=10){
+  if (pixels.length <= k) return pixels.concat().slice(0,k).map(p=>p.slice());
+  // init centers: sample k pixels spread out
   const centers = [];
-  for (let i=0;i<k;i++) centers.push(pixels[Math.floor(Math.random()*pixels.length)].slice());
+  const used = new Set();
+  while (centers.length < k){
+    const idx = Math.floor(Math.random()*pixels.length);
+    if (used.has(idx)) continue;
+    used.add(idx);
+    centers.push(pixels[idx].slice());
+  }
   for (let iter=0; iter<maxIter; iter++){
     const sums = Array.from({length:k}, ()=>[0,0,0,0]);
     for (let i=0;i<pixels.length;i++){
       const p = pixels[i];
-      let best=0, bestd=dist2(p, centers[0]);
+      let best=0, bestd = dist2(p, centers[0]);
       for (let c=1;c<k;c++){
-        const d = dist2(p, centers[c]);
-        if (d < bestd){ best = c; bestd = d; }
+        const d=dist2(p, centers[c]);
+        if (d < bestd){best=c; bestd=d;}
       }
-      sums[best][0] += p[0]; sums[best][1] += p[1]; sums[best][2] += p[2]; sums[best][3] += 1;
+      sums[best][0]+=p[0]; sums[best][1]+=p[1]; sums[best][2]+=p[2]; sums[best][3]++;
     }
-    let moved=false;
+    let moved = false;
     for (let c=0;c<k;c++){
       if (sums[c][3] === 0) continue;
-      const nr = sums[c][0]/sums[c][3], ng = sums[c][1]/sums[c][3], nb = sums[c][2]/sums[c][3];
-      if (Math.abs(nr - centers[c][0]) > 0.5 || Math.abs(ng - centers[c][1]) > 0.5 || Math.abs(nb - centers[c][2]) > 0.5) moved=true;
+      const nr = sums[c][0] / sums[c][3], ng = sums[c][1]/sums[c][3], nb = sums[c][2]/sums[c][3];
+      if (Math.abs(nr - centers[c][0]) > 0.5 || Math.abs(ng - centers[c][1]) > 0.5 || Math.abs(nb - centers[c][2]) > 0.5) moved = true;
       centers[c] = [nr, ng, nb];
     }
     if (!moved) break;
@@ -328,30 +381,150 @@ function kmeans(pixels, k=4, maxIter=10){
 function assignLabels(pixels, centers){
   const labels = new Array(pixels.length);
   for (let i=0;i<pixels.length;i++){
-    let best=0, bestd=dist2(pixels[i], centers[0]);
+    const p = pixels[i]; let best=0, bestd=dist2(p, centers[0]);
     for (let c=1;c<centers.length;c++){
-      const d = dist2(pixels[i], centers[c]);
-      if (d < bestd){ best = c; bestd = d; }
+      const d=dist2(p, centers[c]);
+      if (d<bestd){best=c;bestd=d;}
     }
-    labels[i] = best;
+    labels[i]=best;
   }
   return labels;
 }
 function dist2(a,b){ return (a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2; }
 
-/* ---------- name lookup (nearest by RGB) ---------- */
+/* ---------- Rendering UI ---------- */
+function renderSwatches(ordered){
+  swatchesEl.innerHTML = '';
+  ordered.forEach((s, idx) => {
+    const rgb = s.rgb; const hex = rgbToHex(rgb);
+    const name = getColorName(rgb);
+    const sw = document.createElement('button');
+    sw.className = 'swatch'; sw.setAttribute('role','listitem'); sw.setAttribute('aria-label', `Color ${hex} ${name}`);
+    sw.style.background = hex;
+    const copyBtn = document.createElement('button'); copyBtn.className = 'copy'; copyBtn.title = 'Copy hex';
+    copyBtn.innerHTML = 'Copy';
+    copyBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); copyToClipboard(hex); copyBtn.innerText='Copied'; setTimeout(()=>copyBtn.innerText='Copy',900); });
+    sw.appendChild(copyBtn);
 
+    const meta = document.createElement('div'); meta.className='meta';
+    const hexEl = document.createElement('div'); hexEl.className='hex'; hexEl.textContent = hex;
+    const nameEl = document.createElement('div'); nameEl.className='name'; nameEl.textContent = name + ` • ${s.count} px`;
+    meta.appendChild(hexEl); meta.appendChild(nameEl);
+    sw.appendChild(meta);
+    sw.addEventListener('click', ()=> selectPrimary(rgb));
+    swatchesEl.appendChild(sw);
+  });
+}
+
+function selectPrimary(rgb){
+  primaryColor = rgb;
+  const hex = rgbToHex(rgb); const name = getColorName(rgb);
+  primaryInfo.innerHTML = `${hex} — ${name} — rgb(${rgb.join(',')}) <span style="margin-left:8px;color:var(--muted)">Click suggested palettes to copy color</span>`;
+  buildSuggestions(rgb);
+}
+
+/* ---------- Palette suggestions ---------- */
+function buildSuggestions(rgb){
+  palettesEl.innerHTML = '';
+  const hsl = rgbToHsl(rgb);
+  const palDefs = [
+    {title:'Complementary', cols: [rgb, hslToRgb(hslShift(hsl,180))]},
+    {title:'Analogous', cols: [hslToRgb(hsl), hslToRgb(hslShift(hsl,-30)), hslToRgb(hslShift(hsl,30))]},
+    {title:'Triadic', cols: [hslToRgb(hsl), hslToRgb(hslShift(hsl,-120)), hslToRgb(hslShift(hsl,120))]},
+    {title:'Tints & Shades', cols: [hslToRgb(hslSetL(hsl, clamp(hsl[2]+20,0,100))), rgb, hslToRgb(hslSetL(hsl, clamp(hsl[2]-20,0,100)))]}
+  ];
+  palDefs.forEach(p=>{
+    const box = document.createElement('div'); box.className='palette';
+    const row = document.createElement('div'); row.className='row';
+    const names = [];
+    p.cols.forEach(c=>{
+      const hex = rgbToHex(c);
+      const chip = document.createElement('div'); chip.className='chip'; chip.style.background = hex;
+      chip.style.flex = '1';
+      chip.title = hex;
+      chip.addEventListener('click', ()=> { copyToClipboard(hex); setStatus(`Copied ${hex}`); setTimeout(()=>setStatus('Ready'),900); });
+      row.appendChild(chip);
+      names.push(getColorName(c));
+    });
+    const meta = document.createElement('div'); meta.className='meta';
+    const title = document.createElement('div'); title.className='title'; title.textContent = p.title;
+    const namesLine = document.createElement('div'); namesLine.className='muted'; namesLine.style.marginTop='6px'; namesLine.textContent = names.join(' • ');
+    meta.appendChild(title); meta.appendChild(namesLine);
+    box.appendChild(row); box.appendChild(meta);
+    palettesEl.appendChild(box);
+  });
+}
+
+/* ---------- Utilities ---------- */
+function rgbToHex(rgb){ return '#' + rgb.map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
+function hexToRgb(hex){ const h = hex.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function copyToClipboard(text){ navigator.clipboard?.writeText(text).catch(()=>{}); }
+
+/* ---------- Color math (HSL helpers) ---------- */
+function rgbToHsl(rgb){
+  const r=rgb[0]/255,g=rgb[1]/255,b=rgb[2]/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b); let h=0,s=0,l=(max+min)/2;
+  if (max!==min){ const d=max-min; s = l>0.5? d/(2-max-min) : d/(max+min); switch(max){case r: h=(g-b)/d + (g<b?6:0); break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; } h*=60; }
+  return [Math.round(h), Math.round(s*100), Math.round(l*100)];
+}
+function hslToRgb(hsl){
+  let [h,s,l] = hsl; s/=100; l/=100;
+  const c = (1 - Math.abs(2*l - 1)) * s; const hp = h/60; const x = c*(1 - Math.abs(hp%2 -1));
+  let r1=0,g1=0,b1=0;
+  if (0<=hp && hp<1){ r1=c; g1=x; b1=0; } else if (1<=hp && hp<2){ r1=x; g1=c; b1=0; } else if (2<=hp && hp<3){ r1=0; g1=c; b1=x; } else if (3<=hp && hp<4){ r1=0; g1=x; b1=c; } else if (4<=hp && hp<5){ r1=x; g1=0; b1=c; } else { r1=c; g1=0; b1=x; }
+  const m = l - c/2; const r = Math.round((r1+m)*255), g = Math.round((g1+m)*255), b = Math.round((b1+m)*255);
+  return [clamp(r,0,255), clamp(g,0,255), clamp(b,0,255)];
+}
+function hslShift(hsl, dh){ return [((hsl[0]+dh+360)%360), hsl[1], hsl[2]]; }
+function hslSetL(hsl, L){ return [hsl[0], hsl[1], clamp(L,0,100)]; }
+
+/* ---------- Color naming (nearest by RGB) ---------- */
 function getColorName(rgb){
   let best = null, bestD = Infinity;
   for (const c of NAMED_COLORS){
-    const hexrgb = hexToRgb(c.hex);
-    const d = dist2(rgb, hexrgb);
+    const cr = hexToRgb(c.hex); const d = dist2(rgb, cr);
     if (d < bestD){ bestD = d; best = c; }
   }
-  // optionally refine name capitalization/spaces
-  return best ? prettifyName(best.name) : 'unknown';
+  return best ? best.name : rgbToHex(rgb);
 }
-function prettifyName(n){ return n.split(/[-_]/).map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join(' '); }
+
+/* ---------- Export JSON & Image ---------- */
+function downloadJSON(){
+  if (!lastPalette) return alert('No palette to download');
+  const data = JSON.stringify(lastPalette, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='palette.json'; a.click(); URL.revokeObjectURL(url);
+  setStatus('Palette JSON downloaded');
+}
+
+function downloadPaletteImage(){
+  if (!lastPalette) return alert('No palette to export');
+  const w = 800, h = 200;
+  const tmp = document.createElement('canvas'); tmp.width=w; tmp.height=h;
+  const tctx = tmp.getContext('2d');
+  const palette = lastPalette.palette;
+  const n = palette.length;
+  const tileW = Math.round(w / n);
+  for (let i=0;i<n;i++){
+    tctx.fillStyle = rgbToHex(palette[i].rgb);
+    tctx.fillRect(i*tileW, 0, tileW, h);
+  }
+  // add labels
+  tctx.fillStyle = 'rgba(255,255,255,0.85)';
+  tctx.font = '18px system-ui';
+  for (let i=0;i<n;i++){
+    const hex = rgbToHex(palette[i].rgb);
+    tctx.fillText(hex, i*tileW + 12, h - 12);
+  }
+  const url = tmp.toDataURL('image/png');
+  const a = document.createElement('a'); a.href=url; a.download='palette.png'; a.click();
+  setStatus('Palette image exported');
+}
+
+/* ---------- Init / helpers ---------- */
+setStatus('Ready');
 
 </script>
 </body>
