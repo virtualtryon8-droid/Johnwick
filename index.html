@@ -3,29 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Garment Color Matcher — Professional</title>
+<title>Garment Color Matcher — Exact Match</title>
 <link rel="icon" href="data:,">
 <style>
   :root{
     --bg:#f4f7fb; --card:#ffffff; --muted:#65707a; --accent:#2563eb; --ok:#16a34a;
-    --radius:12px; --shadow: 0 8px 28px rgba(18,38,63,0.08);
+    --radius:10px;
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    color-scheme: light;
   }
   html,body{height:100%;margin:0;background:linear-gradient(180deg,#f6f9ff 0%,var(--bg) 100%);-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1100px;margin:28px auto;padding:20px;}
-  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-  .brand{display:flex;align-items:center;gap:12px}
+  .wrap{max-width:1050px;margin:28px auto;padding:18px;}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
   .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
   h1{font-size:1.15rem;margin:0}
   .subtitle{color:var(--muted);font-size:13px}
 
-  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 8px 28px rgba(18,38,63,0.06)}
   .preview-card{display:flex;flex-direction:column;gap:12px;min-height:420px}
   .canvas-wrap{position:relative;border-radius:10px;border:1px solid rgba(16,24,40,0.04);overflow:hidden;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:320px}
+  .drop-hint{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.9);padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted)}
   canvas{max-width:100%;height:auto;display:block}
-  .drop-hint{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.9);padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);box-shadow:0 6px 18px rgba(12,24,48,0.04)}
   .controls{display:flex;flex-direction:column;gap:12px}
   .row{display:flex;gap:8px;align-items:center}
   .file-btn{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;border:1px dashed rgba(37,99,235,0.18);background:linear-gradient(180deg,rgba(37,99,235,0.04),transparent);color:var(--accent);cursor:pointer}
@@ -43,55 +41,45 @@
   .swatch .meta{background:rgba(255,255,255,0.92);padding:8px;font-size:13px;display:flex;flex-direction:column;gap:4px}
   .swatch .meta .hex{font-weight:700}
   .swatch .meta .name{font-size:12px;color:var(--muted)}
-  .swatch .copy{position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.85);border-radius:6px;padding:6px;font-size:12px;border:0;cursor:pointer}
-  .suggestions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+  .copy{position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.85);border-radius:6px;padding:6px;font-size:12px;border:0;cursor:pointer}
+  .palettes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
   .palette{border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.04);background:#fff}
-  .palette .row{height:44px;display:flex}
+  .palette .row{height:40px;display:flex}
+  .palette .chip{flex:1 1 0%;min-width:0;height:100%}
   .palette .meta{padding:10px;font-size:13px;color:var(--muted)}
-  .palette .title{font-weight:700;color:#0f172a}
-  .options{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .footer{margin-top:12px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
-  .export{display:flex;gap:8px;align-items:center}
   .kbd{background:#f2f4f7;border-radius:6px;padding:6px;font-family:monospace;font-size:12px}
 
-  /* selection rectangle */
-  .sel-rect{position:absolute;border:2px dashed rgba(255,255,255,0.85);pointer-events:none;box-sizing:border-box;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))}
-  /* responsive */
-  @media (max-width:980px){ .grid{grid-template-columns:1fr} .preview-card{min-height:320px} .card{padding:14px} }
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} .preview-card{min-height:320px} }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="brand">
-        <div class="logo">GM</div>
-        <div>
-          <h1>Garment Color Matcher</h1>
-          <div class="subtitle">Extract garment colors, see named matches and suggested palettes — runs in your browser.</div>
-        </div>
+      <div class="logo">GM</div>
+      <div>
+        <h1>Garment Color Matcher</h1>
+        <div class="subtitle">Extract an exact garment color and find the perceptually nearest named color (Delta E), plus suggested palettes.</div>
       </div>
     </header>
 
     <div class="grid">
-      <!-- Left: Preview + canvas -->
       <div class="card preview-card" aria-live="polite">
         <div class="canvas-wrap" id="canvasWrap" tabindex="0" aria-label="Image preview area. Drop an image here or use upload.">
           <div id="dropHint" class="drop-hint">Drop image or click Upload</div>
           <canvas id="canvas" role="img" aria-label="Uploaded image preview"></canvas>
-          <div id="selRect" class="sel-rect" style="display:none"></div>
         </div>
 
         <div class="row">
           <label class="file-btn" title="Click to open file picker">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M12 3v12" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l4-4 4 4" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Upload image</span>
+            <span>Upload Image</span>
             <input id="file" type="file" accept="image/*" capture="environment" />
           </label>
 
-          <button class="btn" id="btnExtract" title="Extract colors from image">Auto Extract</button>
-          <button class="btn ghost" id="btnClear" title="Clear image">Clear</button>
+          <button class="btn" id="btnExtract">Auto Extract</button>
+          <button class="btn ghost" id="btnClear">Clear</button>
 
-          <div style="margin-left:auto" class="muted">Tip: crop selection to focus on the garment</div>
+          <div style="margin-left:auto" class="muted">Tip: crop close to the garment for best results</div>
         </div>
 
         <div class="row">
@@ -104,11 +92,9 @@
             </select>
           </label>
 
-          <label style="margin-left:12px" class="small"><input type="checkbox" id="useSelection" /> Use selection</label>
-
-          <div style="margin-left:auto" class="options">
-            <button id="downloadJSON" class="btn small" title="Download palette JSON">Download JSON</button>
-            <button id="downloadImage" class="btn small" title="Download palette image" style="background:linear-gradient(90deg,#f97316,#f43f5e)">Export Image</button>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button id="downloadJSON" class="btn small">Download JSON</button>
+            <button id="downloadImage" class="btn small" style="background:linear-gradient(90deg,#f97316,#f43f5e)">Export Image</button>
           </div>
         </div>
 
@@ -116,84 +102,64 @@
           <div class="muted" style="margin-top:8px">Dominant colors (click to set primary)</div>
           <div id="swatches" class="swatches" role="list" aria-label="Extracted color swatches"></div>
         </div>
-
       </div>
 
-      <!-- Right: Suggestions + metadata -->
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-weight:700;font-size:15px">Selected primary</div>
             <div id="primaryInfo" class="muted" style="margin-top:6px">No color selected</div>
+            <div id="exactMatch" style="margin-top:8px;color:#0f172a;font-size:14px"></div>
           </div>
-          <div class="export">
+          <div style="display:flex;gap:8px;align-items:center">
             <div id="status" class="muted">Ready</div>
           </div>
         </div>
 
         <div style="margin-top:12px">
           <div class="muted">Suggested palettes</div>
-          <div id="palettes" class="suggestions"></div>
+          <div id="palettes" class="palettes"></div>
         </div>
 
         <div class="footer">
-          <div class="muted">Runs fully client-side — no uploads required.</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="kbd">Local</div>
-          </div>
+          <div class="muted">Runs fully client-side — your images stay in your browser.</div>
+          <div class="kbd">Local</div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-/* Professional Garment Color Matcher
-   - Drag & drop + file picker + camera
-   - Resizable selection (click+drag) to crop area for extraction
-   - KMeans (client-side) on downsampled pixels
-   - Color name lookup (nearest from a curated list)
-   - Copy-to-clipboard and export features
+/* Full updated single-file app:
+   - KMeans extraction (client-side)
+   - CIE Lab conversion + CIEDE2000 deltaE calculation
+   - Nearest named color search using extended CSS color list
+   - Shows exact match name and deltaE alongside UI
+   - Exports JSON/image
 */
 
-/* ---------- Config ---------- */
-const SAMPLE_MAX = 240; // downsample max for KMeans
-const DEFAULT_K = 4;
-const NAMED_COLORS = [
-  // curated list for friendly names (expandable)
-  {name:'Black',hex:'#000000'},{name:'White',hex:'#ffffff'},{name:'Gray',hex:'#808080'},{name:'Silver',hex:'#c0c0c0'},
-  {name:'Red',hex:'#ff0000'},{name:'Maroon',hex:'#800000'},{name:'Orange',hex:'#ff7f00'},{name:'Gold',hex:'#ffd700'},
-  {name:'Yellow',hex:'#ffff00'},{name:'Olive',hex:'#808000'},{name:'Green',hex:'#008000'},{name:'Lime',hex:'#00ff00'},
-  {name:'Teal',hex:'#008080'},{name:'Cyan',hex:'#00ffff'},{name:'Blue',hex:'#0000ff'},{name:'Navy',hex:'#000080'},
-  {name:'Purple',hex:'#800080'},{name:'Magenta',hex:'#ff00ff'},{name:'Pink',hex:'#ffc0cb'},{name:'Coral',hex:'#ff7f50'},
-  {name:'Salmon',hex:'#fa8072'},{name:'Brown',hex:'#a52a2a'},{name:'Beige',hex:'#f5f5dc'},{name:'Khaki',hex:'#f0e68c'},
-  {name:'Lavender',hex:'#e6e6fa'},{name:'Indigo',hex:'#4b0082'},{name:'Royal Blue',hex:'#4169e1'},{name:'Sky Blue',hex:'#87ceeb'},
-  {name:'Mint',hex:'#98ff98'},{name:'Olive Drab',hex:'#6b8e23'},{name:'Chocolate',hex:'#d2691e'},{name:'Tomato',hex:'#ff6347'}
-];
-
+/* ---------- Config & elements ---------- */
+const SAMPLE_MAX = 240;
 const fileInput = document.getElementById('file');
 const canvas = document.getElementById('canvas');
 const canvasWrap = document.getElementById('canvasWrap');
-const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const dropHint = document.getElementById('dropHint');
 const swatchesEl = document.getElementById('swatches');
 const btnExtract = document.getElementById('btnExtract');
 const btnClear = document.getElementById('btnClear');
 const numColorsSel = document.getElementById('numColors');
-const useSelectionCheckbox = document.getElementById('useSelection');
 const palettesEl = document.getElementById('palettes');
 const primaryInfo = document.getElementById('primaryInfo');
+const exactMatchEl = document.getElementById('exactMatch');
 const statusEl = document.getElementById('status');
-const selRectEl = document.getElementById('selRect');
 const downloadJSONBtn = document.getElementById('downloadJSON');
 const downloadImageBtn = document.getElementById('downloadImage');
 
 let imgObj = null;
-let imageDataCache = null;
 let lastPalette = null;
 let primaryColor = null;
 
-/* ---------- Drag & Drop + file handling ---------- */
-function setStatus(t){ statusEl.textContent = t; }
+/* ---------- Drag & drop + file input ---------- */
 ['dragenter','dragover'].forEach(ev => {
   canvasWrap.addEventListener(ev, e => { e.preventDefault(); canvasWrap.style.outline='2px solid rgba(37,99,235,0.18)'; dropHint.textContent='Drop to upload'; });
 });
@@ -205,149 +171,72 @@ canvasWrap.addEventListener('drop', e=>{
   const f = e.dataTransfer.files && e.dataTransfer.files[0];
   if (f) handleFile(f);
 });
+fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); });
 
-fileInput.addEventListener('change', async (e)=> {
-  const f = e.target.files[0]; if (!f) return;
-  handleFile(f);
-});
-
-/* ---------- File load & draw ---------- */
-async function handleFile(file){
+/* ---------- File loading & drawing ---------- */
+function setStatus(t){ statusEl.textContent = t; }
+function handleFile(file){
   setStatus('Loading image…');
   const url = URL.createObjectURL(file);
   const img = new Image(); img.crossOrigin = 'anonymous';
-  img.onload = () => {
-    URL.revokeObjectURL(url);
-    imgObj = img;
-    drawImageToCanvas(img);
-    setStatus('Image loaded');
-  };
-  img.onerror = () => { setStatus('Failed to load image'); alert('Unable to load image'); };
+  img.onload = () => { URL.revokeObjectURL(url); imgObj = img; drawImageToCanvas(img); setStatus('Image loaded'); };
+  img.onerror = () => { setStatus('Failed to load'); alert('Unable to load image'); };
   img.src = url;
 }
-
 function drawImageToCanvas(img){
-  // fit into container width
   const maxW = Math.min(canvasWrap.clientWidth, 900);
   const scale = Math.min(maxW / img.width, 1);
   const w = Math.round(img.width * scale);
   const h = Math.round(img.height * scale);
   canvas.width = w; canvas.height = h;
-  ctx.clearRect(0,0,w,h);
-  // white background for transparent images
+  const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
   ctx.drawImage(img, 0, 0, w, h);
-  imageDataCache = ctx.getImageData(0,0,w,h);
-  clearSelectionVisual();
-  swatchesEl.innerHTML = '';
-  palettesEl.innerHTML = '';
-  primaryInfo.textContent = 'No color selected';
+  swatchesEl.innerHTML = ''; palettesEl.innerHTML = ''; primaryInfo.textContent = 'No color selected'; exactMatchEl.textContent = '';
 }
 
-/* ---------- Selection/Crop Rectangle ---------- */
-let selecting = false, selStart = null, selRect = null;
-canvasWrap.addEventListener('pointerdown', e=>{
-  if (!imgObj) return;
-  // only start selection if pointer is over the canvas
-  const rect = canvas.getBoundingClientRect();
-  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
-  selecting = true;
-  selStart = {x: e.clientX - rect.left, y: e.clientY - rect.top};
-  selRect = {x: selStart.x, y: selStart.y, w: 0, h: 0};
-  updateSelectionVisual();
-});
-window.addEventListener('pointermove', e=>{
-  if (!selecting || !selStart) return;
-  const rect = canvas.getBoundingClientRect();
-  selRect.w = Math.max(1, Math.min(rect.width, (e.clientX - rect.left) - selStart.x));
-  selRect.h = Math.max(1, Math.min(rect.height, (e.clientY - rect.top) - selStart.y));
-  updateSelectionVisual();
-});
-window.addEventListener('pointerup', e=>{
-  if (!selecting) return;
-  selecting = false;
-  useSelectionCheckbox.checked = true;
-  // normalize negative widths (if user dragged left/up)
-  if (selRect.w < 0){ selRect.x += selRect.w; selRect.w = Math.abs(selRect.w); }
-  if (selRect.h < 0){ selRect.y += selRect.h; selRect.h = Math.abs(selRect.h); }
-  updateSelectionVisual();
-});
-
-function updateSelectionVisual(){
-  if (!selRect){ selRectEl.style.display = 'none'; return; }
-  selRectEl.style.left = (selRect.x + canvas.offsetLeft) + 'px';
-  selRectEl.style.top = (selRect.y + canvas.offsetTop) + 'px';
-  selRectEl.style.width = selRect.w + 'px';
-  selRectEl.style.height = selRect.h + 'px';
-  selRectEl.style.display = 'block';
-}
-function clearSelectionVisual(){
-  selRect = null;
-  selRectEl.style.display = 'none';
-  useSelectionCheckbox.checked = false;
-}
-
-/* ---------- Extraction (KMeans) ---------- */
-
-btnExtract.addEventListener('click', extractAndShow);
-btnClear.addEventListener('click', ()=>{
-  imgObj = null; ctx.clearRect(0,0,canvas.width,canvas.height); swatchesEl.innerHTML=''; palettesEl.innerHTML=''; primaryInfo.textContent='No color selected'; setStatus('Cleared'); clearSelectionVisual();
-});
+/* ---------- Controls ---------- */
+btnExtract.addEventListener('click', () => { if (!imgObj) return alert('Upload an image first'); extractAndShow(); });
+btnClear.addEventListener('click', () => { imgObj = null; const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); swatchesEl.innerHTML=''; palettesEl.innerHTML=''; primaryInfo.textContent='No color selected'; exactMatchEl.textContent=''; setStatus('Cleared'); });
 downloadJSONBtn.addEventListener('click', downloadJSON);
 downloadImageBtn.addEventListener('click', downloadPaletteImage);
 
+/* ---------- Extraction pipeline ---------- */
 function extractAndShow(){
-  if (!imgObj) return alert('Please upload an image first');
-  setStatus('Extracting colors…');
-  setTimeout(()=>{ // allow UI update
+  setStatus('Extracting…');
+  setTimeout(()=>{
     const pixels = samplePixels();
-    if (pixels.length === 0){ setStatus('No valid pixels'); alert('No valid pixels found (try disabling use selection or upload a different image).'); return; }
-    const k = parseInt(numColorsSel.value,10) || DEFAULT_K;
+    if (pixels.length === 0){ setStatus('No valid pixels'); return alert('No valid pixels found — try another image or crop closer'); }
+    const k = parseInt(numColorsSel.value,10) || 4;
     const centers = kmeans(pixels, k, 12);
     const labels = assignLabels(pixels, centers);
-    const counts = centers.map(()=>0);
-    labels.forEach(l=>counts[l]++);
-    const ordered = centers.map((c,i)=>({rgb: c.map(v=>Math.round(v)), count: counts[i]})).sort((a,b)=>b.count - a.count);
-    lastPalette = {input:'client',palette:ordered};
+    const counts = centers.map(()=>0); labels.forEach(l=>counts[l]++);
+    const ordered = centers.map((c,i)=>({rgb: c.map(v=>Math.round(v)), count: counts[i]})).sort((a,b)=>b.count-a.count);
+    lastPalette = {input:'client', palette: ordered};
     renderSwatches(ordered);
     setStatus('Done');
-  }, 80);
+  }, 60);
 }
 
 function samplePixels(){
-  // extract image data for either whole canvas or selection
   const w = canvas.width, h = canvas.height;
-  let sx=0, sy=0, sw=w, sh=h;
-  if (useSelectionCheckbox.checked && selRect){
-    sx = Math.max(0, Math.floor(selRect.x));
-    sy = Math.max(0, Math.floor(selRect.y));
-    sw = Math.max(1, Math.min(w - sx, Math.floor(selRect.w)));
-    sh = Math.max(1, Math.min(h - sy, Math.floor(selRect.h)));
-  }
-  // downsample for speed
-  const scale = Math.min(1, SAMPLE_MAX / Math.max(sw, sh));
-  const tmpW = Math.max(1, Math.round(sw * scale));
-  const tmpH = Math.max(1, Math.round(sh * scale));
-  const tmp = document.createElement('canvas');
-  tmp.width = tmpW; tmp.height = tmpH;
-  const tctx = tmp.getContext('2d');
-  tctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, tmpW, tmpH);
-  const id = tctx.getImageData(0,0,tmpW,tmpH).data;
+  const tmp = document.createElement('canvas'); const scale = Math.min(1, SAMPLE_MAX / Math.max(w,h));
+  tmp.width = Math.max(1, Math.round(w*scale)); tmp.height = Math.max(1, Math.round(h*scale));
+  const tctx = tmp.getContext('2d'); tctx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
+  const id = tctx.getImageData(0,0,tmp.width,tmp.height).data;
   const pixels = [];
   for (let i=0;i<id.length;i+=4){
     const r=id[i], g=id[i+1], b=id[i+2], a=id[i+3];
-    if (a < 125) continue; // ignore transparent
-    const lum = (r+g+b)/3;
-    if (lum < 8 || lum > 247) continue; // avoid extreme very dark/light background
+    if (a < 125) continue;
+    const lum = (r+g+b)/3; if (lum < 8 || lum > 247) continue;
     pixels.push([r,g,b]);
   }
   return pixels;
 }
 
-/* ---------- KMeans (simple, lightweight) ---------- */
+/* ---------- KMeans ---------- */
 function kmeans(pixels, k=4, maxIter=10){
-  if (pixels.length <= k) return pixels.concat().slice(0,k).map(p=>p.slice());
-  // init centers: sample k pixels spread out
+  if (pixels.length <= k) return pixels.slice(0,k).map(p=>p.slice());
   const centers = [];
   const used = new Set();
   while (centers.length < k){
@@ -359,19 +248,15 @@ function kmeans(pixels, k=4, maxIter=10){
   for (let iter=0; iter<maxIter; iter++){
     const sums = Array.from({length:k}, ()=>[0,0,0,0]);
     for (let i=0;i<pixels.length;i++){
-      const p = pixels[i];
-      let best=0, bestd = dist2(p, centers[0]);
-      for (let c=1;c<k;c++){
-        const d=dist2(p, centers[c]);
-        if (d < bestd){best=c; bestd=d;}
-      }
+      const p = pixels[i]; let best=0, bd = dist2(p, centers[0]);
+      for (let c=1;c<k;c++){ const d = dist2(p, centers[c]); if (d < bd){ bd = d; best = c; } }
       sums[best][0]+=p[0]; sums[best][1]+=p[1]; sums[best][2]+=p[2]; sums[best][3]++;
     }
-    let moved = false;
+    let moved=false;
     for (let c=0;c<k;c++){
       if (sums[c][3] === 0) continue;
-      const nr = sums[c][0] / sums[c][3], ng = sums[c][1]/sums[c][3], nb = sums[c][2]/sums[c][3];
-      if (Math.abs(nr - centers[c][0]) > 0.5 || Math.abs(ng - centers[c][1]) > 0.5 || Math.abs(nb - centers[c][2]) > 0.5) moved = true;
+      const nr = sums[c][0]/sums[c][3], ng = sums[c][1]/sums[c][3], nb = sums[c][2]/sums[c][3];
+      if (Math.abs(nr - centers[c][0]) > 0.5 || Math.abs(ng - centers[c][1]) > 0.5 || Math.abs(nb - centers[c][2]) > 0.5) moved=true;
       centers[c] = [nr, ng, nb];
     }
     if (!moved) break;
@@ -381,31 +266,26 @@ function kmeans(pixels, k=4, maxIter=10){
 function assignLabels(pixels, centers){
   const labels = new Array(pixels.length);
   for (let i=0;i<pixels.length;i++){
-    const p = pixels[i]; let best=0, bestd=dist2(p, centers[0]);
-    for (let c=1;c<centers.length;c++){
-      const d=dist2(p, centers[c]);
-      if (d<bestd){best=c;bestd=d;}
-    }
-    labels[i]=best;
+    const p = pixels[i]; let best=0, bd = dist2(p, centers[0]);
+    for (let c=1;c<centers.length;c++){ const d = dist2(p, centers[c]); if (d < bd){ bd = d; best = c; } }
+    labels[i] = best;
   }
   return labels;
 }
 function dist2(a,b){ return (a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2; }
 
-/* ---------- Rendering UI ---------- */
+/* ---------- UI rendering ---------- */
 function renderSwatches(ordered){
   swatchesEl.innerHTML = '';
+  palettesEl.innerHTML = '';
+  primaryInfo.textContent = 'No color selected';
+  exactMatchEl.textContent = '';
   ordered.forEach((s, idx) => {
-    const rgb = s.rgb; const hex = rgbToHex(rgb);
-    const name = getColorName(rgb);
-    const sw = document.createElement('button');
-    sw.className = 'swatch'; sw.setAttribute('role','listitem'); sw.setAttribute('aria-label', `Color ${hex} ${name}`);
-    sw.style.background = hex;
-    const copyBtn = document.createElement('button'); copyBtn.className = 'copy'; copyBtn.title = 'Copy hex';
-    copyBtn.innerHTML = 'Copy';
-    copyBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); copyToClipboard(hex); copyBtn.innerText='Copied'; setTimeout(()=>copyBtn.innerText='Copy',900); });
+    const rgb = s.rgb; const hex = rgbToHex(rgb); const name = findNearestNamedColor(rgb, CSS_COLOR_LIST).name;
+    const sw = document.createElement('div'); sw.className = 'swatch'; sw.style.background = hex;
+    const copyBtn = document.createElement('button'); copyBtn.className = 'copy'; copyBtn.innerText = 'Copy'; copyBtn.title='Copy hex';
+    copyBtn.addEventListener('click', (ev) => { ev.stopPropagation(); navigator.clipboard?.writeText(hex); copyBtn.innerText='✔'; setTimeout(()=>copyBtn.innerText='Copy',900); });
     sw.appendChild(copyBtn);
-
     const meta = document.createElement('div'); meta.className='meta';
     const hexEl = document.createElement('div'); hexEl.className='hex'; hexEl.textContent = hex;
     const nameEl = document.createElement('div'); nameEl.className='name'; nameEl.textContent = name + ` • ${s.count} px`;
@@ -418,19 +298,20 @@ function renderSwatches(ordered){
 
 function selectPrimary(rgb){
   primaryColor = rgb;
-  const hex = rgbToHex(rgb); const name = getColorName(rgb);
-  primaryInfo.innerHTML = `${hex} — ${name} — rgb(${rgb.join(',')}) <span style="margin-left:8px;color:var(--muted)">Click suggested palettes to copy color</span>`;
+  const hex = rgbToHex(rgb); const nm = findNearestNamedColor(rgb, CSS_COLOR_LIST);
+  primaryInfo.innerHTML = `${hex} — rgb(${rgb.join(',')}) — Nearest: <strong>${nm.name}</strong> (${nm.hex})`;
+  exactMatchEl.innerHTML = `DeltaE: <strong>${nm.deltaE.toFixed(2)}</strong> — ${nm.deltaE <= 2 ? '<span style="color:var(--ok)">very close match</span>' : 'visual difference may be noticeable'}`;
   buildSuggestions(rgb);
 }
 
-/* ---------- Palette suggestions ---------- */
+/* ---------- Palette suggestions (harmony rules) ---------- */
 function buildSuggestions(rgb){
   palettesEl.innerHTML = '';
   const hsl = rgbToHsl(rgb);
   const palDefs = [
     {title:'Complementary', cols: [rgb, hslToRgb(hslShift(hsl,180))]},
-    {title:'Analogous', cols: [hslToRgb(hsl), hslToRgb(hslShift(hsl,-30)), hslToRgb(hslShift(hsl,30))]},
-    {title:'Triadic', cols: [hslToRgb(hsl), hslToRgb(hslShift(hsl,-120)), hslToRgb(hslShift(hsl,120))]},
+    {title:'Analogous', cols: [hslToRgb(hslShift(hsl,-30)), rgb, hslToRgb(hslShift(hsl,30))]},
+    {title:'Triadic', cols: [rgb, hslToRgb(hslShift(hsl,120)), hslToRgb(hslShift(hsl,-120))]},
     {title:'Tints & Shades', cols: [hslToRgb(hslSetL(hsl, clamp(hsl[2]+20,0,100))), rgb, hslToRgb(hslSetL(hsl, clamp(hsl[2]-20,0,100)))]}
   ];
   palDefs.forEach(p=>{
@@ -438,92 +319,213 @@ function buildSuggestions(rgb){
     const row = document.createElement('div'); row.className='row';
     const names = [];
     p.cols.forEach(c=>{
-      const hex = rgbToHex(c);
+      const rgbv = (Array.isArray(c) && c.length===3 && c[0] <= 255) ? c : hslToRgb(c);
+      const hex = rgbToHex(rgbv);
       const chip = document.createElement('div'); chip.className='chip'; chip.style.background = hex;
-      chip.style.flex = '1';
-      chip.title = hex;
-      chip.addEventListener('click', ()=> { copyToClipboard(hex); setStatus(`Copied ${hex}`); setTimeout(()=>setStatus('Ready'),900); });
+      chip.addEventListener('click', ()=> { navigator.clipboard?.writeText(hex); setStatus(`Copied ${hex}`); setTimeout(()=>setStatus('Ready'),900); });
       row.appendChild(chip);
-      names.push(getColorName(c));
+      names.push(findNearestNamedColor(rgbv, CSS_COLOR_LIST).name);
     });
     const meta = document.createElement('div'); meta.className='meta';
-    const title = document.createElement('div'); title.className='title'; title.textContent = p.title;
-    const namesLine = document.createElement('div'); namesLine.className='muted'; namesLine.style.marginTop='6px'; namesLine.textContent = names.join(' • ');
-    meta.appendChild(title); meta.appendChild(namesLine);
+    meta.innerHTML = `<div style="font-weight:700">${p.title}</div><div style="margin-top:6px">${names.join(' • ')}</div>`;
     box.appendChild(row); box.appendChild(meta);
     palettesEl.appendChild(box);
   });
 }
 
-/* ---------- Utilities ---------- */
-function rgbToHex(rgb){ return '#' + rgb.map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
-function hexToRgb(hex){ const h = hex.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
-function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-function copyToClipboard(text){ navigator.clipboard?.writeText(text).catch(()=>{}); }
-
-/* ---------- Color math (HSL helpers) ---------- */
-function rgbToHsl(rgb){
-  const r=rgb[0]/255,g=rgb[1]/255,b=rgb[2]/255;
-  const max=Math.max(r,g,b), min=Math.min(r,g,b); let h=0,s=0,l=(max+min)/2;
-  if (max!==min){ const d=max-min; s = l>0.5? d/(2-max-min) : d/(max+min); switch(max){case r: h=(g-b)/d + (g<b?6:0); break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; } h*=60; }
-  return [Math.round(h), Math.round(s*100), Math.round(l*100)];
-}
-function hslToRgb(hsl){
-  let [h,s,l] = hsl; s/=100; l/=100;
-  const c = (1 - Math.abs(2*l - 1)) * s; const hp = h/60; const x = c*(1 - Math.abs(hp%2 -1));
-  let r1=0,g1=0,b1=0;
-  if (0<=hp && hp<1){ r1=c; g1=x; b1=0; } else if (1<=hp && hp<2){ r1=x; g1=c; b1=0; } else if (2<=hp && hp<3){ r1=0; g1=c; b1=x; } else if (3<=hp && hp<4){ r1=0; g1=x; b1=c; } else if (4<=hp && hp<5){ r1=x; g1=0; b1=c; } else { r1=c; g1=0; b1=x; }
-  const m = l - c/2; const r = Math.round((r1+m)*255), g = Math.round((g1+m)*255), b = Math.round((b1+m)*255);
-  return [clamp(r,0,255), clamp(g,0,255), clamp(b,0,255)];
-}
-function hslShift(hsl, dh){ return [((hsl[0]+dh+360)%360), hsl[1], hsl[2]]; }
-function hslSetL(hsl, L){ return [hsl[0], hsl[1], clamp(L,0,100)]; }
-
-/* ---------- Color naming (nearest by RGB) ---------- */
-function getColorName(rgb){
-  let best = null, bestD = Infinity;
-  for (const c of NAMED_COLORS){
-    const cr = hexToRgb(c.hex); const d = dist2(rgb, cr);
-    if (d < bestD){ bestD = d; best = c; }
-  }
-  return best ? best.name : rgbToHex(rgb);
-}
-
-/* ---------- Export JSON & Image ---------- */
+/* ---------- Export helpers ---------- */
 function downloadJSON(){
   if (!lastPalette) return alert('No palette to download');
-  const data = JSON.stringify(lastPalette, null, 2);
-  const blob = new Blob([data], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='palette.json'; a.click(); URL.revokeObjectURL(url);
+  const blob = new Blob([JSON.stringify(lastPalette, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'palette.json'; a.click(); URL.revokeObjectURL(url);
   setStatus('Palette JSON downloaded');
 }
-
 function downloadPaletteImage(){
   if (!lastPalette) return alert('No palette to export');
   const w = 800, h = 200;
   const tmp = document.createElement('canvas'); tmp.width=w; tmp.height=h;
   const tctx = tmp.getContext('2d');
   const palette = lastPalette.palette;
-  const n = palette.length;
-  const tileW = Math.round(w / n);
-  for (let i=0;i<n;i++){
-    tctx.fillStyle = rgbToHex(palette[i].rgb);
-    tctx.fillRect(i*tileW, 0, tileW, h);
-  }
-  // add labels
-  tctx.fillStyle = 'rgba(255,255,255,0.85)';
-  tctx.font = '18px system-ui';
-  for (let i=0;i<n;i++){
-    const hex = rgbToHex(palette[i].rgb);
-    tctx.fillText(hex, i*tileW + 12, h - 12);
-  }
-  const url = tmp.toDataURL('image/png');
-  const a = document.createElement('a'); a.href=url; a.download='palette.png'; a.click();
+  const n = palette.length; const tileW = Math.round(w / n);
+  for (let i=0;i<n;i++){ tctx.fillStyle = rgbToHex(palette[i].rgb); tctx.fillRect(i*tileW, 0, tileW, h); }
+  tctx.fillStyle = 'rgba(255,255,255,0.85)'; tctx.font = '18px system-ui';
+  for (let i=0;i<n;i++){ const hex = rgbToHex(palette[i].rgb); tctx.fillText(hex, i*tileW + 12, h - 12); }
+  const url = tmp.toDataURL('image/png'); const a = document.createElement('a'); a.href=url; a.download='palette.png'; a.click();
   setStatus('Palette image exported');
 }
 
-/* ---------- Init / helpers ---------- */
+/* ---------- Color math: HSL helpers ---------- */
+function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+function rgbToHex(rgb){ return '#' + rgb.map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
+function rgbToHsl(rgb){
+  const r=rgb[0]/255,g=rgb[1]/255,b=rgb[2]/255; const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0,s=0,l=(max+min)/2;
+  if (max!==min){ const d=max-min; s = l>0.5 ? d/(2-max-min) : d/(max+min); switch(max){ case r: h=(g-b)/d + (g<b?6:0); break; case g: h=(b-r)/d + 2; break; default: h=(r-g)/d + 4; } h *= 60; }
+  return [Math.round(h), Math.round(s*100), Math.round(l*100)];
+}
+function hslToRgb(hsl){
+  let [h,s,l] = hsl; s/=100; l/=100;
+  const c = (1 - Math.abs(2*l - 1)) * s; const hp = h/60; const x = c*(1 - Math.abs(hp%2 - 1));
+  let r1=0,g1=0,b1=0;
+  if (0<=hp && hp<1){ r1=c; g1=x; b1=0; } else if (1<=hp && hp<2){ r1=x; g1=c; b1=0; } else if (2<=hp && hp<3){ r1=0; g1=c; b1=x; } else if (3<=hp && hp<4){ r1=0; g1=x; b1=c; } else if (4<=hp && hp<5){ r1=x; g1=0; b1=c; } else { r1=c; g1=0; b1=x; }
+  const m = l - c/2; return [clamp(Math.round((r1+m)*255),0,255), clamp(Math.round((g1+m)*255),0,255), clamp(Math.round((b1+m)*255),0,255)];
+}
+function hslShift(hsl, dh){ return [((hsl[0]+dh+360)%360), hsl[1], hsl[2]]; }
+function hslSetL(hsl, L){ return [hsl[0], hsl[1], clamp(L,0,100)]; }
+
+/* ---------- Exact match: RGB -> Lab and CIEDE2000 ---------- */
+// sRGB (0..255) -> CIE Lab (D65)
+function rgbToLab(rgb){
+  function pivot(n){
+    n = n / 255;
+    return n <= 0.04045 ? (n / 12.92) : Math.pow((n + 0.055) / 1.055, 2.4);
+  }
+  const r = pivot(rgb[0]), g = pivot(rgb[1]), b = pivot(rgb[2]);
+  // linear RGB to XYZ
+  const x = r*0.4124564 + g*0.3575761 + b*0.1804375;
+  const y = r*0.2126729 + g*0.7151522 + b*0.0721750;
+  const z = r*0.0193339 + g*0.1191920 + b*0.9503041;
+  const refX = 0.95047, refY = 1.00000, refZ = 1.08883;
+  function f(t){ return t > 0.008856 ? Math.cbrt(t) : (7.787037 * t + 16/116); }
+  const fx = f(x / refX), fy = f(y / refY), fz = f(z / refZ);
+  const L = Math.max(0, 116 * fy - 16);
+  const A = 500 * (fx - fy);
+  const B = 200 * (fy - fz);
+  return {L, A, B};
+}
+
+// CIEDE2000 algorithm implementation (returns deltaE)
+function deltaE00(lab1, lab2){
+  // Implementation adapted for clarity; inputs: {L,A,B}
+  const L1 = lab1.L, a1 = lab1.A, b1 = lab1.B;
+  const L2 = lab2.L, a2 = lab2.A, b2 = lab2.B;
+  const avgLp = (L1 + L2) / 2.0;
+  const C1 = Math.sqrt(a1*a1 + b1*b1);
+  const C2 = Math.sqrt(a2*a2 + b2*b2);
+  const avgC = (C1 + C2) / 2.0;
+  const G = 0.5 * (1 - Math.sqrt(Math.pow(avgC,7) / (Math.pow(avgC,7) + Math.pow(25,7))));
+  const a1p = (1 + G) * a1;
+  const a2p = (1 + G) * a2;
+  const C1p = Math.sqrt(a1p*a1p + b1*b1);
+  const C2p = Math.sqrt(a2p*a2p + b2*b2);
+  const avgCp = (C1p + C2p) / 2.0;
+  function atan2Deg(y,x){ return Math.atan2(y,x) * 180 / Math.PI; }
+  function deg2rad(d){ return d * Math.PI / 180; }
+  let h1p = (Math.abs(a1p) + Math.abs(b1) < 1e-9) ? 0 : atan2Deg(b1, a1p);
+  if (h1p < 0) h1p += 360;
+  let h2p = (Math.abs(a2p) + Math.abs(b2) < 1e-9) ? 0 : atan2Deg(b2, a2p);
+  if (h2p < 0) h2p += 360;
+  const dLp = L2 - L1;
+  const dCp = C2p - C1p;
+  let dhp = 0;
+  if (C1p * C2p === 0) dhp = 0;
+  else{
+    let diff = h2p - h1p;
+    if (Math.abs(diff) <= 180) dhp = diff;
+    else if (diff > 180) dhp = diff - 360;
+    else dhp = diff + 360;
+  }
+  const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(deg2rad(dhp / 2));
+  let hpp = 0;
+  if (C1p * C2p === 0) hpp = h1p + h2p;
+  else{
+    let diff = Math.abs(h1p - h2p);
+    if (diff <= 180) hpp = (h1p + h2p) / 2;
+    else if ((h1p + h2p) < 360) hpp = (h1p + h2p + 360) / 2;
+    else hpp = (h1p + h2p - 360) / 2;
+  }
+  const T = 1 - 0.17*Math.cos(deg2rad(hpp - 30)) + 0.24*Math.cos(deg2rad(2*hpp))
+            + 0.32*Math.cos(deg2rad(3*hpp + 6)) - 0.20*Math.cos(deg2rad(4*hpp - 63));
+  const deltaTheta = 30 * Math.exp(- (( (hpp - 275) / 25) ** 2));
+  const Rc = 2 * Math.sqrt(Math.pow(avgCp,7) / (Math.pow(avgCp,7) + Math.pow(25,7)));
+  const Sl = 1 + ((0.015 * ((avgLp - 50) ** 2)) / Math.sqrt(20 + ((avgLp - 50) ** 2)));
+  const Sc = 1 + 0.045 * avgCp;
+  const Sh = 1 + 0.015 * avgCp * T;
+  const Rt = - Math.sin(deg2rad(2 * deltaTheta)) * Rc;
+  const kl = 1, kc = 1, kh = 1;
+  const dE = Math.sqrt(
+    (dLp / (kl * Sl))**2 +
+    (dCp / (kc * Sc))**2 +
+    (dHp / (kh * Sh))**2 +
+    Rt * (dCp / (kc * Sc)) * (dHp / (kh * Sh))
+  );
+  return dE;
+}
+
+// Find nearest named color using deltaE (Lab)
+function findNearestNamedColor(rgb, colorList){
+  const lab1 = rgbToLab(rgb);
+  let best = null, bestDE = Infinity;
+  for (const c of colorList){
+    const hex = c.hex.replace('#','');
+    const r = parseInt(hex.substring(0,2),16), g = parseInt(hex.substring(2,4),16), b = parseInt(hex.substring(4,6),16);
+    const lab2 = rgbToLab([r,g,b]);
+    const dE = deltaE00(lab1, lab2);
+    if (dE < bestDE){ bestDE = dE; best = {name: c.name, hex: '#' + hex.toLowerCase(), deltaE: dE}; }
+  }
+  return best;
+}
+
+/* ---------- Extended CSS color list (140+). Use for nearest-match. ---------- */
+const CSS_COLOR_LIST = [
+  {name:'AliceBlue', hex:'#F0F8FF'},{name:'AntiqueWhite', hex:'#FAEBD7'},{name:'Aqua', hex:'#00FFFF'},{name:'Aquamarine', hex:'#7FFFD4'},
+  {name:'Azure', hex:'#F0FFFF'},{name:'Beige', hex:'#F5F5DC'},{name:'Bisque', hex:'#FFE4C4'},{name:'Black', hex:'#000000'},
+  {name:'BlanchedAlmond', hex:'#FFEBCD'},{name:'Blue', hex:'#0000FF'},{name:'BlueViolet', hex:'#8A2BE2'},{name:'Brown', hex:'#A52A2A'},
+  {name:'BurlyWood', hex:'#DEB887'},{name:'CadetBlue', hex:'#5F9EA0'},{name:'Chartreuse', hex:'#7FFF00'},{name:'Chocolate', hex:'#D2691E'},
+  {name:'Coral', hex:'#FF7F50'},{name:'CornflowerBlue', hex:'#6495ED'},{name:'Cornsilk', hex:'#FFF8DC'},{name:'Crimson', hex:'#DC143C'},
+  {name:'Cyan', hex:'#00FFFF'},{name:'DarkBlue', hex:'#00008B'},{name:'DarkCyan', hex:'#008B8B'},{name:'DarkGoldenRod', hex:'#B8860B'},
+  {name:'DarkGray', hex:'#A9A9A9'},{name:'DarkGreen', hex:'#006400'},{name:'DarkKhaki', hex:'#BDB76B'},{name:'DarkMagenta', hex:'#8B008B'},
+  {name:'DarkOliveGreen', hex:'#556B2F'},{name:'DarkOrange', hex:'#FF8C00'},{name:'DarkOrchid', hex:'#9932CC'},{name:'DarkRed', hex:'#8B0000'},
+  {name:'DarkSalmon', hex:'#E9967A'},{name:'DarkSeaGreen', hex:'#8FBC8F'},{name:'DarkSlateBlue', hex:'#483D8B'},{name:'DarkSlateGray', hex:'#2F4F4F'},
+  {name:'DarkTurquoise', hex:'#00CED1'},{name:'DarkViolet', hex:'#9400D3'},{name:'DeepPink', hex:'#FF1493'},{name:'DeepSkyBlue', hex:'#00BFFF'},
+  {name:'DimGray', hex:'#696969'},{name:'DodgerBlue', hex:'#1E90FF'},{name:'FireBrick', hex:'#B22222'},{name:'FloralWhite', hex:'#FFFAF0'},
+  {name:'ForestGreen', hex:'#228B22'},{name:'Fuchsia', hex:'#FF00FF'},{name:'Gainsboro', hex:'#DCDCDC'},{name:'GhostWhite', hex:'#F8F8FF'},
+  {name:'Gold', hex:'#FFD700'},{name:'GoldenRod', hex:'#DAA520'},{name:'Gray', hex:'#808080'},{name:'Green', hex:'#008000'},
+  {name:'GreenYellow', hex:'#ADFF2F'},{name:'HoneyDew', hex:'#F0FFF0'},{name:'HotPink', hex:'#FF69B4'},{name:'IndianRed', hex:'#CD5C5C'},
+  {name:'Indigo', hex:'#4B0082'},{name:'Ivory', hex:'#FFFFF0'},{name:'Khaki', hex:'#F0E68C'},{name:'Lavender', hex:'#E6E6FA'},
+  {name:'LavenderBlush', hex:'#FFF0F5'},{name:'LawnGreen', hex:'#7CFC00'},{name:'LemonChiffon', hex:'#FFFACD'},{name:'LightBlue', hex:'#ADD8E6'},
+  {name:'LightCoral', hex:'#F08080'},{name:'LightCyan', hex:'#E0FFFF'},{name:'LightGoldenRodYellow', hex:'#FAFAD2'},{name:'LightGray', hex:'#D3D3D3'},
+  {name:'LightGreen', hex:'#90EE90'},{name:'LightPink', hex:'#FFB6C1'},{name:'LightSalmon', hex:'#FFA07A'},{name:'LightSeaGreen', hex:'#20B2AA'},
+  {name:'LightSkyBlue', hex:'#87CEFA'},{name:'LightSlateGray', hex:'#778899'},{name:'LightSteelBlue', hex:'#B0C4DE'},{name:'LightYellow', hex:'#FFFFE0'},
+  {name:'Lime', hex:'#00FF00'},{name:'LimeGreen', hex:'#32CD32'},{name:'Linen', hex:'#FAF0E6'},{name:'Magenta', hex:'#FF00FF'},
+  {name:'Maroon', hex:'#800000'},{name:'MediumAquaMarine', hex:'#66CDAA'},{name:'MediumBlue', hex:'#0000CD'},{name:'MediumOrchid', hex:'#BA55D3'},
+  {name:'MediumPurple', hex:'#9370DB'},{name:'MediumSeaGreen', hex:'#3CB371'},{name:'MediumSlateBlue', hex:'#7B68EE'},{name:'MediumSpringGreen', hex:'#00FA9A'},
+  {name:'MediumTurquoise', hex:'#48D1CC'},{name:'MediumVioletRed', hex:'#C71585'},{name:'MidnightBlue', hex:'#191970'},{name:'MintCream', hex:'#F5FFFA'},
+  {name:'MistyRose', hex:'#FFE4E1'},{name:'Moccasin', hex:'#FFE4B5'},{name:'NavajoWhite', hex:'#FFDEAD'},{name:'Navy', hex:'#000080'},
+  {name:'OldLace', hex:'#FDF5E6'},{name:'Olive', hex:'#808000'},{name:'OliveDrab', hex:'#6B8E23'},{name:'Orange', hex:'#FFA500'},
+  {name:'OrangeRed', hex:'#FF4500'},{name:'Orchid', hex:'#DA70D6'},{name:'PaleGoldenRod', hex:'#EEE8AA'},{name:'PaleGreen', hex:'#98FB98'},
+  {name:'PaleTurquoise', hex:'#AFEEEE'},{name:'PaleVioletRed', hex:'#DB7093'},{name:'PapayaWhip', hex:'#FFEFD5'},{name:'PeachPuff', hex:'#FFDAB9'},
+  {name:'Peru', hex:'#CD853F'},{name:'Pink', hex:'#FFC0CB'},{name:'Plum', hex:'#DDA0DD'},{name:'PowderBlue', hex:'#B0E0E6'},
+  {name:'Purple', hex:'#800080'},{name:'RebeccaPurple', hex:'#663399'},{name:'Red', hex:'#FF0000'},{name:'RosyBrown', hex:'#BC8F8F'},
+  {name:'RoyalBlue', hex:'#4169E1'},{name:'SaddleBrown', hex:'#8B4513'},{name:'Salmon', hex:'#FA8072'},{name:'SandyBrown', hex:'#F4A460'},
+  {name:'SeaGreen', hex:'#2E8B57'},{name:'SeaShell', hex:'#FFF5EE'},{name:'Sienna', hex:'#A0522D'},{name:'Silver', hex:'#C0C0C0'},
+  {name:'SkyBlue', hex:'#87CEEB'},{name:'SlateBlue', hex:'#6A5ACD'},{name:'SlateGray', hex:'#708090'},{name:'Snow', hex:'#FFFAFA'},
+  {name:'SpringGreen', hex:'#00FF7F'},{name:'SteelBlue', hex:'#4682B4'},{name:'Tan', hex:'#D2B48C'},{name:'Teal', hex:'#008080'},
+  {name:'Thistle', hex:'#D8BFD8'},{name:'Tomato', hex:'#FF6347'},{name:'Turquoise', hex:'#40E0D0'},{name:'Violet', hex:'#EE82EE'},
+  {name:'Wheat', hex:'#F5DEB3'},{name:'White', hex:'#FFFFFF'},{name:'WhiteSmoke', hex:'#F5F5F5'},{name:'Yellow', hex:'#FFFF00'},
+  {name:'YellowGreen', hex:'#9ACD32'}
+];
+
+/* ---------- Nearest-match wrapper (uses Lab + CIEDE2000) ---------- */
+function findNearestNamedColor(rgb, colorList){
+  const best = findNearestNamedColor; // alias for outer function (exists above) - safe fallback
+  // use previously defined implementation
+  // We call the implementation defined earlier (it's the same name).
+  return (function(rgbLocal, list){ // inline to avoid accidental hoisting issues
+    const lab1 = rgbToLab(rgbLocal);
+    let bestRes = null, bestDE = Infinity;
+    for (const c of list){
+      const hex = c.hex.replace('#','');
+      const r = parseInt(hex.substring(0,2),16), g = parseInt(hex.substring(2,4),16), b = parseInt(hex.substring(4,6),16);
+      const lab2 = rgbToLab([r,g,b]);
+      const dE = deltaE00(lab1, lab2);
+      if (dE < bestDE){ bestDE = dE; bestRes = {name: c.name, hex: '#' + hex.toLowerCase(), deltaE: dE}; }
+    }
+    return bestRes;
+  })(rgb, colorList);
+}
+
+/* ---------- Initialization ---------- */
 setStatus('Ready');
 
 </script>
